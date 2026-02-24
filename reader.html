@@ -79,33 +79,3 @@
             animation: spin 1s linear infinite;
             margin-bottom: 15px;
         }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
-</head>
-<body>
-    <div id="readerContainer">
-        <div class="book-info">
-            <h2 id="bookTitle">Загрузка книги...</h2>
-            <p id="bookAuthor"></p>
-        </div>
-        
-        <div id="pdfViewer">
-            <div class="loading">
-                <div class="spinner"></div>
-                <p>Подождите, книга загружается...</p>
-            </div>
-        </div>
-        
-        <div class="controls">
-            <button class="back-btn" onclick="goBack()">← Назад в библиотеку</button>
-            <button onclick="downloadBook()">Скачать книгу (PDF)</button>
-        </div>
-    </div>
-
-    <script src="js/reader.js"></script>
-</body>
-</html>
