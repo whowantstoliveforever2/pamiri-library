@@ -5,16 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Читалка</title>
     <link rel="stylesheet" href="css/style.css">
+    <script src="pdfjs/build/pdf.js"></script>
     <style>
-        #readerContainer {
-            max-width: 900px;
-            margin: 0 auto;
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        
         #pdfViewer {
             width: 100%;
             height: 70vh;
@@ -22,51 +14,24 @@
             border-radius: 10px;
             overflow: auto;
         }
-        
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-            padding: 10px;
-            background: #f5f5f5;
-            border-radius: 10px;
-        }
-        
-        .controls button {
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .controls button:hover {
-            background: #764ba2;
-        }
-        
-        .back-btn {
-            background: #6c757d;
-        }
-        
-        .back-btn:hover {
-            background: #5a6268;
+        #pdfViewer canvas {
+            width: 100%;
+            height: auto;
         }
     </style>
 </head>
 <body>
     <div id="readerContainer">
-        <h2 id="bookTitle">Загрузка книги...</h2>
-        <p id="bookAuthor"></p>
-        
-        <div id="pdfViewer">
-            <iframe id="pdfFrame" width="100%" height="100%" frameborder="0"></iframe>
+        <div class="book-info">
+            <h2 id="bookTitle">Загрузка книги...</h2>
+            <p id="bookAuthor"></p>
         </div>
+        
+        <div id="pdfViewer"></div>
         
         <div class="controls">
             <button class="back-btn" onclick="goBack()">← Назад в библиотеку</button>
-            <button onclick="downloadBook()">Скачать книгу</button>
+            <button onclick="downloadBook()">Скачать книгу (PDF)</button>
         </div>
     </div>
 
