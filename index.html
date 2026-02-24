@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📚 Библиотека Памира</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>📚 Библиотека Памира</h1>
+        <p>Книги на памирских языках и о памирской культуре</p>
+        
+        <div class="filters">
+            <button onclick="filterBooks('all')">Все книги</button>
+            <button onclick="filterBooks('shughni')">Шугнанский</button>
+            <button onclick="filterBooks('russian')">Русский</button>
+            <button onclick="filterBooks('english')">English</button>
+            <button onclick="filterBooks('culture')">Культура</button>
+        </div>
+        
+        <input type="text" id="searchInput" placeholder="Поиск книг..." onkeyup="searchBooks()">
+    </header>
+
+    <main id="bookList">
+        <!-- Книги будут загружаться сюда -->
+    </main>
+
+    <script src="js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+{
+  "books": [
+    {
+      "id": "1",
+      "title": "Сказания Памира",
+      "author": "Додихудо Карамшоев",
+      "language": "shughni",
+      "category": "folklore",
+      "cover": "covers/skazaniya.jpg",
+      "pdfUrl": "https://github.com/ваш-ник/pamiri-library/raw/main/books/skazaniya.pdf",
+      "description": "Сборник народных сказаний и преданий памирского народа."
+    },
+    {
+      "id": "2",
+      "title": "История Памира",
+      "author": "Аноним",
+      "language": "russian",
+      "category": "history",
+      "cover": "covers/istoriya.jpg",
+      "pdfUrl": "https://github.com/ваш-ник/pamiri-library/raw/main/books/istoriya.pdf",
+      "description": "Исторический очерк о Памирском регионе."
+    },
+    {
+      "id": "3",
+      "title": "Pamir Culture",
+      "author": "Researcher",
+      "language": "english",
+      "category": "culture",
+      "cover": "covers/culture.jpg",
+      "pdfUrl": "https://github.com/ваш-ник/pamiri-library/raw/main/books/culture.pdf",
+      "description": "Overview of Pamiri traditions and customs."
+    }
+  ]
+}
