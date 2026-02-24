@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Читалка</title>
     <link rel="stylesheet" href="css/style.css">
-    <script src="pdfjs/pdf.js"></script>
     <style>
         #pdfViewer {
             width: 100%;
@@ -13,12 +12,77 @@
             border: 1px solid #ddd;
             border-radius: 10px;
             overflow: auto;
+            margin: 20px 0;
         }
-        #pdfViewer canvas {
+        
+        #pdfViewer iframe {
             width: 100%;
-            height: auto;
-            margin: 0 auto;
-            display: block;
+            height: 100%;
+            border: none;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 10px;
+        }
+        
+        .controls button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .controls button:hover {
+            background: #764ba2;
+        }
+        
+        .back-btn {
+            background: #6c757d;
+        }
+        
+        .back-btn:hover {
+            background: #5a6268;
+        }
+        
+        .book-info {
+            margin-bottom: 20px;
+        }
+        
+        .book-info h2 {
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 70vh;
+            text-align: center;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -29,7 +93,12 @@
             <p id="bookAuthor"></p>
         </div>
         
-        <div id="pdfViewer"></div>
+        <div id="pdfViewer">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Подождите, книга загружается...</p>
+            </div>
+        </div>
         
         <div class="controls">
             <button class="back-btn" onclick="goBack()">← Назад в библиотеку</button>
