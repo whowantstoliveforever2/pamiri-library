@@ -79,3 +79,156 @@
             animation: spin 1s linear infinite;
             margin-bottom: 15px;
         }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            background: #fff3f3;
+            border-left: 4px solid #ff4444;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        .error-message h3 {
+            color: #d32f2f;
+            margin-top: 0;
+        }
+        
+        .error-message p {
+            color: #555;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div id="readerContainer">
+        <div class="book-info">
+            <h2 id="bookTitle">Загрузка книги...</h2>
+            <p id="bookAuthor"></p>
+        </div>
+        
+        <div id="pdfViewer">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Подождите, книга загружается...</p>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="back-btn" onclick="goBack()">← Назад в библиотеку</button>
+            <button onclick="downloadBook()">Скачать книгу (PDF)</button>
+        </div>
+    </div>
+
+    <script>
+        // Загрузка книги
+        function loadBook() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const bookId = urlParams.get('id');
+            
+            if (!bookId) {
+                showError('Ошибка: не указана книга');
+                return;
+            }
+            
+            fetch('books.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Не удалось загрузить базу данных книг');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const book = data.books.find(b => b.id === bookId);
+                    if (book) {
+                        document.getElementById('bookTitle').textContent = book.title;
+                        document.getElementById('bookAuthor').textContent = `Автор: ${book.author}`;
+                        
+                        // Проверяем, что URL содержит "raw.githubusercontent.com"
+                        if (!book.pdfUrl.includes('raw.githubusercontent.com')) {
+                            showError('Ошибка: неправильный URL книги. Используйте прямую ссылку через raw.githubusercontent.com');
+                            return;
+                        }
+                        
+                        // Загружаем через Google Docs Viewer
+                        const pdfViewer = document.getElementById('pdfViewer');
+                        pdfViewer.innerHTML = '<div class="loading"><div class="spinner"></div><p>Подождите, книга загружается...</p></div>';
+                        
+                        // Используем Google Docs Viewer
+                        const googleDocsUrl = `https://docs.google.com/gview?url=${encodeURIComponent(book.pdfUrl)}&embedded=true`;
+                        
+                        // Создаем iframe
+                        const iframe = document.createElement('iframe');
+                        iframe.src = googleDocsUrl;
+                        iframe.style.width = '100%';
+                        iframe.style.height = '100%';
+                        iframe.style.border = 'none';
+                        iframe.setAttribute('allow', 'fullscreen');
+                        
+                        // Убираем сообщение о загрузке и добавляем iframe
+                        setTimeout(() => {
+                            pdfViewer.innerHTML = '';
+                            pdfViewer.appendChild(iframe);
+                        }, 500);
+                    } else {
+                        showError('Книга не найдена в базе данных');
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка загрузки базы данных:', error);
+                    showError('Ошибка загрузки базы данных: ' + error.message);
+                });
+        }
+        
+        function showError(message) {
+            const pdfViewer = document.getElementById('pdfViewer');
+            pdfViewer.innerHTML = `
+                <div class="error-message">
+                    <h3>⚠️ Ошибка</h3>
+                    <p>${message}</p>
+                    <p style="color: #777; margin-top: 15px; font-size: 14px;">
+                        Если проблема не решается, попробуйте скачать книгу или обратитесь к администратору сайта.
+                    </p>
+                    <button onclick="downloadBook()" style="background: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin-top: 15px; cursor: pointer;">Скачать книгу</button>
+                </div>
+            `;
+        }
+        
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+        
+        function downloadBook() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const bookId = urlParams.get('id');
+            
+            if (!bookId) {
+                alert('Ошибка: не указана книга');
+                return;
+            }
+            
+            fetch('books.json')
+                .then(response => response.json())
+                .then(data => {
+                    const book = data.books.find(b => b.id === bookId);
+                    if (book) {
+                        window.open(book.pdfUrl, '_blank');
+                    } else {
+                        alert('Книга не найдена');
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);
+                    alert('Ошибка загрузки данных книги');
+                });
+        }
+        
+        // Загрузить книгу при загрузке страницы
+        window.addEventListener('DOMContentLoaded', loadBook);
+    </script>
+</body>
+</html>
