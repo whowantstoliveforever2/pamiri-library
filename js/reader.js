@@ -1,5 +1,6 @@
 let currentBook = null;
 let pdfDoc = null;
+let currentPageNum = 1;
 
 // Получаем ID книги из URL
 const urlParams = new URLSearchParams(window.location.search);
