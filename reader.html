@@ -17,6 +17,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            background: #f9f9f9;
         }
         
         #pdfViewer canvas {
@@ -80,10 +81,12 @@
         .book-info h2 {
             color: #667eea;
             margin-bottom: 5px;
+            font-size: 1.8em;
         }
         
         .book-info p {
             color: #666;
+            font-size: 1.1em;
         }
         
         .loading {
@@ -132,6 +135,7 @@
             font-weight: bold;
             min-width: 120px;
             text-align: center;
+            font-size: 1.1em;
         }
         
         .zoom-controls {
@@ -174,6 +178,30 @@
         
         body.dark-theme .book-info h2 {
             color: #9b89ff;
+        }
+        
+        body.dark-theme .book-info p {
+            color: #bbb;
+        }
+        
+        #readerContainer {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            #readerContainer {
+                padding: 20px;
+            }
         }
     </style>
 </head>
@@ -257,7 +285,9 @@
                             renderPage(currentPage);
                         }).catch(function(error) {
                             console.error('Ошибка загрузки документа:', error);
-                            showError('Не удалось загрузить книгу: ' + error.message);
+                            showError('Не удалось загрузить книгу: ' + error.message + 
+                                '<br><br><strong>Попробуйте скачать книгу:</strong>');
+                            addDownloadButton();
                         });
                     } else {
                         showError('Книга не найдена в базе данных');
@@ -356,9 +386,27 @@
                     <p style="color: #777; margin-top: 15px; font-size: 14px;">
                         Если проблема не решается, попробуйте скачать книгу или обратитесь к администратору сайта.
                     </p>
-                    <button onclick="downloadBook()" style="background: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin-top: 15px; cursor: pointer;">Скачать книгу</button>
                 </div>
             `;
+        }
+        
+        function addDownloadButton() {
+            const downloadBtn = document.createElement('button');
+            downloadBtn.textContent = '⬇️ Скачать книгу (PDF)';
+            downloadBtn.style.cssText = `
+                background: #4CAF50;
+                color: white;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 25px;
+                cursor: pointer;
+                font-size: 16px;
+                margin-top: 15px;
+                transition: all 0.3s;
+            `;
+            downloadBtn.onclick = downloadBook;
+            
+            document.querySelector('.error-message').appendChild(downloadBtn);
         }
         
         function goBack() {
