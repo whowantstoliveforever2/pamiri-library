@@ -6,8 +6,8 @@
       "author": "Додихудо Карамшоев",
       "language": "shughni",
       "category": "folklore",
-      "cover": "covers/skazaniya.jpg",
-      "pdfUrl": "https://github.com/whowantstoliveforever2/pamiri-library/raw/main/books/example.pdf",
+      "cover": "covers/default.jpg",
+      "pdfUrl": "https://raw.githubusercontent.com/whowantstoliveforever2/pamiri-library/main/books/example.pdf",
       "description": "Сборник народных сказаний и преданий памирского народа."
     },
     {
@@ -17,7 +17,7 @@
       "language": "russian",
       "category": "history",
       "cover": "covers/istoriya.jpg",
-      "pdfUrl": "https://github.com/ваш-ник/pamiri-library/raw/main/books/istoriya.pdf",
+      "pdfUrl": "https://docs.google.com/gview?url=https://github.com/whowantstoliveforever2/pamiri-library/raw/main/books/example.pdf&embedded=true",
       "description": "Исторический очерк о Памирском регионе."
     },
     {

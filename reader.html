@@ -5,18 +5,203 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Читалка</title>
     <link rel="stylesheet" href="css/style.css">
-    <script src="pdfjs/build/pdf.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.4.120/build/pdf.min.js"></script>
     <style>
         #pdfViewer {
             width: 100%;
-            height: 70vh;
+            min-height: 70vh;
             border: 1px solid #ddd;
             border-radius: 10px;
             overflow: auto;
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f9f9f9;
         }
+        
         #pdfViewer canvas {
-            width: 100%;
-            height: auto;
+            display: block;
+            margin: 0 auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .control-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .controls button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        .controls button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+        
+        .controls button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .back-btn {
+            background: #6c757d;
+        }
+        
+        .back-btn:hover {
+            background: #5a6268;
+        }
+        
+        .book-info {
+            margin-bottom: 20px;
+        }
+        
+        .book-info h2 {
+            color: #667eea;
+            margin-bottom: 5px;
+            font-size: 1.8em;
+        }
+        
+        .book-info p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 70vh;
+            text-align: center;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            background: #fff3f3;
+            border-left: 4px solid #ff4444;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        .error-message h3 {
+            color: #d32f2f;
+            margin-top: 0;
+        }
+        
+        .error-message p {
+            color: #555;
+            line-height: 1.6;
+        }
+        
+        .page-info {
+            font-weight: bold;
+            min-width: 120px;
+            text-align: center;
+            font-size: 1.1em;
+        }
+        
+        .zoom-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .zoom-value {
+            min-width: 50px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .theme-toggle {
+            background: #4facfe;
+        }
+        
+        .theme-toggle:hover {
+            background: #3c89d8;
+        }
+        
+        body.dark-theme {
+            background: #1a1a1a;
+            color: #e0e0e0;
+        }
+        
+        body.dark-theme #readerContainer {
+            background: #2d2d2d;
+            color: #e0e0e0;
+        }
+        
+        body.dark-theme .controls {
+            background: #3a3a3a;
+        }
+        
+        body.dark-theme #pdfViewer {
+            background: #1a1a1a;
+        }
+        
+        body.dark-theme .book-info h2 {
+            color: #9b89ff;
+        }
+        
+        body.dark-theme .book-info p {
+            color: #bbb;
+        }
+        
+        #readerContainer {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            #readerContainer {
+                padding: 20px;
+            }
         }
     </style>
 </head>
@@ -27,14 +212,220 @@
             <p id="bookAuthor"></p>
         </div>
         
-        <div id="pdfViewer"></div>
+        <div id="pdfViewer">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Подождите, книга загружается...</p>
+            </div>
+        </div>
         
         <div class="controls">
-            <button class="back-btn" onclick="goBack()">← Назад в библиотеку</button>
-            <button onclick="downloadBook()">Скачать книгу (PDF)</button>
+            <div class="control-group">
+                <button class="back-btn" onclick="goBack()">← Назад в библиотеку</button>
+                <button onclick="toggleTheme()">🌙 Ночной режим</button>
+            </div>
+            
+            <div class="control-group">
+                <button onclick="prevPage()">← Предыдущая</button>
+                <span class="page-info" id="pageInfo">Страница 1</span>
+                <button onclick="nextPage()">Следующая →</button>
+            </div>
+            
+            <div class="control-group">
+                <button onclick="zoomOut()">-</button>
+                <span class="zoom-value" id="zoomValue">150%</span>
+                <button onclick="zoomIn()">+</button>
+            </div>
+            
+            <div class="control-group">
+                <button onclick="downloadBook()">⬇️ Скачать книгу (PDF)</button>
+            </div>
         </div>
     </div>
 
-    <script src="js/reader.js"></script>
+    <script>
+        let currentBook = null;
+        let pdfDoc = null;
+        let currentPage = 1;
+        let scale = 1.5;
+        let isDarkTheme = false;
+
+        // Настройка worker для PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.4.120/build/pdf.worker.min.js';
+
+        // Загрузка книги
+        function loadBook() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const bookId = urlParams.get('id');
+            
+            if (!bookId) {
+                showError('Ошибка: не указана книга');
+                return;
+            }
+            
+            fetch('books.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Не удалось загрузить базу данных книг');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const book = data.books.find(b => b.id === bookId);
+                    if (book) {
+                        currentBook = book;
+                        document.getElementById('bookTitle').textContent = book.title;
+                        document.getElementById('bookAuthor').textContent = `Автор: ${book.author}`;
+                        
+                        // Загружаем документ PDF
+                        const loadingTask = pdfjsLib.getDocument(book.pdfUrl);
+                        loadingTask.promise.then(function(pdf) {
+                            pdfDoc = pdf;
+                            updatePageInfo();
+                            renderPage(currentPage);
+                        }).catch(function(error) {
+                            console.error('Ошибка загрузки документа:', error);
+                            showError('Не удалось загрузить книгу: ' + error.message + 
+                                '<br><br><strong>Попробуйте скачать книгу:</strong>');
+                            addDownloadButton();
+                        });
+                    } else {
+                        showError('Книга не найдена в базе данных');
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка загрузки базы данных:', error);
+                    showError('Ошибка загрузки базы данных: ' + error.message);
+                });
+        }
+        
+        // Отображение страницы
+        function renderPage(pageNumber) {
+            if (!pdfDoc) return;
+            
+            pdfDoc.getPage(pageNumber).then(function(page) {
+                const viewport = page.getViewport({ scale: scale });
+                
+                // Создаем канвас
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                
+                // Очищаем область просмотра и добавляем канвас
+                const pdfViewer = document.getElementById('pdfViewer');
+                pdfViewer.innerHTML = '';
+                pdfViewer.appendChild(canvas);
+                
+                // Рендерим страницу
+                const renderContext = {
+                    canvasContext: context,
+                    viewport: viewport
+                };
+                
+                page.render(renderContext);
+                updatePageInfo();
+            });
+        }
+        
+        // Навигация
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderPage(currentPage);
+            }
+        }
+        
+        function nextPage() {
+            if (currentPage < pdfDoc.numPages) {
+                currentPage++;
+                renderPage(currentPage);
+            }
+        }
+        
+        // Масштабирование
+        function zoomIn() {
+            scale += 0.2;
+            if (scale > 3.0) scale = 3.0;
+            updateZoomValue();
+            renderPage(currentPage);
+        }
+        
+        function zoomOut() {
+            scale -= 0.2;
+            if (scale < 0.5) scale = 0.5;
+            updateZoomValue();
+            renderPage(currentPage);
+        }
+        
+        function updateZoomValue() {
+            const zoomValue = document.getElementById('zoomValue');
+            zoomValue.textContent = Math.round(scale * 100) + '%';
+        }
+        
+        function updatePageInfo() {
+            const pageInfo = document.getElementById('pageInfo');
+            pageInfo.textContent = `Страница ${currentPage} из ${pdfDoc.numPages}`;
+        }
+        
+        // Ночной режим
+        function toggleTheme() {
+            isDarkTheme = !isDarkTheme;
+            document.body.classList.toggle('dark-theme', isDarkTheme);
+            const button = event.target;
+            button.textContent = isDarkTheme ? '☀️ Дневной режим' : '🌙 Ночной режим';
+        }
+        
+        // Ошибки
+        function showError(message) {
+            const pdfViewer = document.getElementById('pdfViewer');
+            pdfViewer.innerHTML = `
+                <div class="error-message">
+                    <h3>⚠️ Ошибка</h3>
+                    <p>${message}</p>
+                    <p style="color: #777; margin-top: 15px; font-size: 14px;">
+                        Если проблема не решается, попробуйте скачать книгу или обратитесь к администратору сайта.
+                    </p>
+                </div>
+            `;
+        }
+        
+        function addDownloadButton() {
+            const downloadBtn = document.createElement('button');
+            downloadBtn.textContent = '⬇️ Скачать книгу (PDF)';
+            downloadBtn.style.cssText = `
+                background: #4CAF50;
+                color: white;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 25px;
+                cursor: pointer;
+                font-size: 16px;
+                margin-top: 15px;
+                transition: all 0.3s;
+            `;
+            downloadBtn.onclick = downloadBook;
+            
+            document.querySelector('.error-message').appendChild(downloadBtn);
+        }
+        
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+        
+        function downloadBook() {
+            if (currentBook && currentBook.pdfUrl) {
+                const link = document.createElement('a');
+                link.href = currentBook.pdfUrl;
+                link.download = currentBook.title + '.pdf';
+                link.click();
+            } else {
+                alert('Ссылка на книгу недоступна');
+            }
+        }
+        
+        // Загрузить книгу при загрузке страницы
+        window.addEventListener('DOMContentLoaded', loadBook);
+    </script>
 </body>
 </html>
